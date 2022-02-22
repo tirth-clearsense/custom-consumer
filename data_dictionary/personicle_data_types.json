@@ -1,0 +1,132 @@
+{
+    "com.personicle": {
+        "individual": {
+            "events": {
+
+            },
+            "datastreams": {
+                "heartrate": {
+                    "ValueType": "Integer",
+                    "Unit": "bpm",
+                    "TableName": "",
+                    "schema": ""
+                },
+                "heart_intensity_minutes": {
+                    "ValueType": "Numeric",
+                    "Unit": "minutes",
+                    "TableName": "",
+                    "schema": ""
+                },
+                "active_minutes": {
+                    "ValueType": "Numeric",
+                    "Unit": "minutes",
+                    "TableName": "",
+                    "schema": ""
+                },
+                "step.cumulative": {
+                    "ValueType": "Integer",
+                    "Unit": "count",
+                    "TableName": "",
+                    "schema": ""
+                },
+                "resting_calories": {
+                    "ValueType": "Numeric",
+                    "Unit": "kilo_calories",
+                    "TableName": "",
+                    "schema": ""
+                },
+                "active_calories": {
+                    "ValueType": "Numeric",
+                    "Unit": "kilo_calories",
+                    "TableName": "",
+                    "schema": ""
+                },
+                "total_calories": {
+                    "ValueType": "Numeric",
+                    "Unit": "kilo_calories",
+                    "TableName": "",
+                    "schema": ""
+                },
+                "distance": {
+                    "ValueType": "Numeric",
+                    "Unit": "meters",
+                    "TableName": "",
+                    "schema": ""
+                },
+                "weight": {
+                    "ValueType": "Numeric",
+                    "Unit": "kilogram",
+                    "TableName": "",
+                    "schema": ""
+                },
+                "cycling.cadence": {
+                    "ValueType": "Numeric",
+                    "Unit": "rpm",
+                    "TableName": "",
+                    "schema": ""
+                },
+                "cycling.power": {
+                    "ValueType": "Numeric",
+                    "Unit": "watts",
+                    "TableName": "",
+                    "schema": ""
+                },
+                "step.cadence": {
+                    "ValueType": "Numeric",
+                    "Unit": "stepsperminute",
+                    "TableName": "",
+                    "schema": ""
+                },
+                "body_fat": {
+                    "ValueType": "Numeric",
+                    "Unit": "percentage",
+                    "TableName": "",
+                    "schema": ""
+                },
+                "height": {
+                    "ValueType": "Numeric",
+                    "Unit": "cm",
+                    "TableName": "",
+                    "schema": ""
+                },
+                "location": {
+                    "ValueType": "Object",
+                    "Unit": "",
+                    "TableName": "",
+                    "schema": ""
+                },
+                "speed": {
+                    "ValueType": "Numeric",
+                    "Unit": "kmph",
+                    "TableName": "",
+                    "schema": ""
+                },
+                "blood_glucose": {
+                    "ValueType": "Numeric",
+                    "Unit": "",
+                    "TableName": "",
+                    "schema": ""
+                },
+                "blood_pressure.systolic": {
+                    "ValueType": "Numeric",
+                    "Unit": "",
+                    "TableName": "",
+                    "schema": ""
+                },
+                "blood_pressure.diastolic": {
+                    "ValueType": "Numeric",
+                    "Unit": "",
+                    "TableName": "",
+                    "schema": ""
+                },
+                "body_temperature": {
+                    "ValueType": "Numeric",
+                    "Unit": "Celsius",
+                    "TableName": "",
+                    "schema": ""
+                }
+
+            }
+        }
+    }
+}
