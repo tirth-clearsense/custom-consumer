@@ -26,10 +26,11 @@ async def on_event(partition_context, event):
     try:
         parsed_schema.validate(event.body_as_json(encoding='UTF-8'))
     except:
+        print("Invalid event: \"{}\" from the partition with ID: \"{}\"".format(event.body_as_json(encoding='UTF-8'), partition_context.partition_id))
+      # {"streamName": "com.personicle.data.heart_rate", "individual_id": "test_user",
         pass
     
-    print("Validated the event: \"{}\" from the partition with ID: \"{}\"".format(event.body_as_json(encoding='UTF-8'), partition_context.partition_id))
-      # {"streamName": "com.personicle.data.heart_rate", "individual_id": "test_user",
+   
 
       # "source": "test_source","dataPoints": []}
 
