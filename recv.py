@@ -21,7 +21,7 @@ async def on_event(partition_context, event):
     try:
         stream_type = event.body_as_json(encoding='UTF-8')['streamName']
         print(f"stream type is {stream_type}")
-        file_path = os.path.join(script_dir, f'avro/{stream_type}+".avsc')
+        file_path = os.path.join(script_dir, f"avro/{stream_type}"+".avsc")
         print(f"file path is {file_path}")
         with open(file_path, 'r') as fi:
             schema = json.load(fi)
