@@ -71,4 +71,4 @@ flask-oidc==1.4.0
 okta==0.0.4
 okta-jwt-verifier==0.2.0
 flask-cors==3.0.9
-avro-validator=1.0.9
+avro-validator==1.0.9
