@@ -1,0 +1,15 @@
+{
+    "namespace": "com.clearsense.personicle",
+    "type": "record",
+    "name": "test_table",
+    "fields": [
+      {
+        "name": "user_id",
+        "type": "string"
+      },
+      {
+        "name": "value",
+        "type": "long"
+      }
+    ]
+  }
