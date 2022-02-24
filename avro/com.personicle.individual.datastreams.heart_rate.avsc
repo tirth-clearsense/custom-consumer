@@ -1,0 +1,39 @@
+{
+    "name": "heart_rate_record",
+    "namespace": "com.personicle.individual.datastreams.heart_rate",
+    "type": "record",
+    "fields": [
+        {
+            "name":"streamName",
+            "type": "string"
+        },
+        {
+            "name": "individual_id",
+            "type": "string"
+        },
+        {
+            "name": "source",
+            "type": "string"
+        },
+        {
+            "name": "confidence",
+            "type": "float"
+        },
+        {
+            "name": "dataPoints",
+            "type": {
+                "type":"array", "items":[
+                    {
+                        "name": "datapoints",
+                        "type":"record",
+                        "fields":[
+                            {"name": "timestamp", "type":"double"},
+                            {"name": "value", "type":"double"}
+                        ]
+                    }
+                ]
+            }
+            
+        }
+    ]
+}
