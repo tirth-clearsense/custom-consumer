@@ -9,9 +9,10 @@ async def run():
     # Create a producer client to send messages to the event hub.
     # Specify a connection string to your event hubs namespace and
     # the event hub name.
-    
-    producer = EventHubProducerClient.from_connection_string(conn_str="Endpoint=sb://personicle-eventhub-dev.servicebus.windows.net/;SharedAccessKeyName=test_analytics_job_namespace_policy;SharedAccessKey=kMGKpnwn++uCnd7aSjQtrUzVq9QwEdKzRMMG1Q1/HQg=;EntityPath=datastream-hub",#Endpoint=sb://personicle-eventhub-dev.servicebus.windows.net/;SharedAccessKeyName=testhub-policy-s1;SharedAccessKey=/WtIDcSPgtcJXOS009LgYhKSPGUTmoJisRVRbmYZllo=;EntityPath=heartrate-hub", 
-                    eventhub_name="datastream-hub")
+    producer = EventHubProducerClient.from_connection_string(conn_str="Endpoint=sb://personicle-eventhub-dev.servicebus.windows.net/;SharedAccessKeyName=testhub-policy-s1;SharedAccessKey=/WtIDcSPgtcJXOS009LgYhKSPGUTmoJisRVRbmYZllo=;EntityPath=testhub-new", 
+                    eventhub_name="testhub-new")
+    # producer = EventHubProducerClient.from_connection_string(conn_str="Endpoint=sb://personicle-eventhub-dev.servicebus.windows.net/;SharedAccessKeyName=test_analytics_job_namespace_policy;SharedAccessKey=kMGKpnwn++uCnd7aSjQtrUzVq9QwEdKzRMMG1Q1/HQg=;EntityPath=datastream-hub",#Endpoint=sb://personicle-eventhub-dev.servicebus.windows.net/;SharedAccessKeyName=testhub-policy-s1;SharedAccessKey=/WtIDcSPgtcJXOS009LgYhKSPGUTmoJisRVRbmYZllo=;EntityPath=heartrate-hub", 
+    #                 eventhub_name="datastream-hub")
     async with producer:
         # Create a batch.
         event_data_batch = await producer.create_batch()
