@@ -22,11 +22,13 @@ async def on_event(partition_context, event):
         stream_type = event.body_as_json(encoding='UTF-8')['streamName']
         print(f"stream type is {stream_type}")
         file_path = os.path.join(script_dir, f'avro/{stream_type}+".avsc')
+        print(f"file path is {file_path}")
         with open(file_path, 'r') as fi:
             schema = json.load(fi)
         
         parsed_schema = parse_schema(schema) 
         validate(event.body_as_json(encoding='UTF-8'), parsed_schema)
+        print("Valid event")
         # get table name here from the event
     except:
         print("Invalid event: \"{}\" from the partition with ID: \"{}\"".format(event.body_as_json(encoding='UTF-8'), partition_context.partition_id))
