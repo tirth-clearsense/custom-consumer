@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import json
 from urllib.request import CacheFTPHandler
 from azure.eventhub.aio import EventHubConsumerClient
@@ -67,7 +68,7 @@ async def on_event(partition_context, event):
             value = datapoint['value']
             # model_class = getClass(table_name)
             # new_record = model_class(individual_id=individual_id,timestamp=timestamp,source=source,value=value,unit=unit,confidence=confidence)
-            query = heartrate.insert().values(individual_id=individual_id,timestamp=timestamp,source=source,value=value,unit=unit,confidence=confidence)
+            query = heartrate.insert().values(individual_id=individual_id,timest=datetime.datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S.%f'),source=source,value=value,unit=unit,confidence=confidence)
             # objects.append(new_record)
             conn.execute(query)
 
@@ -88,7 +89,7 @@ async def on_event(partition_context, event):
     await partition_context.update_checkpoint(event)
 
 async def main():
-        # current_event = {'streamName': 'com.personicle.individual.datastreams.heartrate', 'individual_id': 'test_user', 'source': 'test_source', 'unit': 'bpm', 'value': 70, 'confidence': 0.8, 'dataPoints': [{'timestamp': '2022-02-25 20:27:08.123187', 'value': 75.26720190743127}, {'timestamp': '2022-02-25 20:27:08.123265', 'value': 64.96455764351987}, {'timestamp': '2022-02-25 20:27:08.123272', 'value': 76.33972288445601}, {'timestamp': '2022-02-25 20:27:08.123276', 'value': 70.18792131489458}, {'timestamp': '2022-02-25 20:27:08.123280', 'value': 55.89733969954463}, {'timestamp': '2022-02-25 20:27:08.123284', 'value': 81.0142328209168}, {'timestamp': '2022-02-25 20:27:08.123288', 'value': 90.60477323034864}, {'timestamp': '2022-02-25 20:27:08.123292', 'value': 84.47981038691515}, {'timestamp': '2022-02-25 20:27:08.123296', 'value': 58.460625783260255}, {'timestamp': '2022-02-25 20:27:08.123301', 'value': 75.9406889349082}]}
+        # current_event = {'streamName': 'com.personicle.individual.datastreams.heartrate', 'individual_id': 'test_user', 'source': 'test_source', 'unit': 'bpm', 'value': 70, 'confidence': 0.8, 'dataPoints': [{'timestamp': '2022-02-25 17:02:57.661759', 'value': 76.97265532011998}, {'timestamp': '2022-02-25 17:02:57.661873', 'value': 87.89798550294134}, {'timestamp': '2022-02-25 17:02:57.661885', 'value': 87.6090529685909}, {'timestamp': '2022-02-25 17:02:57.661894', 'value': 73.33626909549803}, {'timestamp': '2022-02-25 17:02:57.661901', 'value': 66.82006849763502}, {'timestamp': '2022-02-25 17:02:57.661909', 'value': 79.71707904392022}, {'timestamp': '2022-02-25 17:02:57.661916', 'value': 103.30694154339136}, {'timestamp': '2022-02-25 17:02:57.661924', 'value': 69.82226428118977}, {'timestamp': '2022-02-25 17:02:57.661931', 'value': 85.32371852228302}, {'timestamp': '2022-02-25 17:02:57.661939', 'value': 90.9156013917515}]}
         # objects=[]
         # stream_type = current_event['streamName']
         # personicle_data_type = stream_type.split(".")
@@ -102,10 +103,16 @@ async def main():
         # for datapoint in current_event['dataPoints']:
         #     timestamp = datapoint['timestamp']
         #     value = datapoint['value']
-        #     model_class = getClass(table_name)
-        #     new_record = model_class(individual_id=individual_id,timestamp=timestamp,source=source,value=value,unit=unit,confidence=confidence)
-        #     objects.append(new_record)
-      
+        #     query = heartrate.insert().values(individual_id=individual_id,timest=datetime.datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S.%f'),source=source,value=value,unit=unit,confidence=confidence)
+         
+        #     conn.execute(query)
+        #     # model_class = getClass(table_name)
+        #     # new_record = model_class(individual_id=individual_id,timestamp=timestamp,source=source,value=value,unit=unit,confidence=confidence)
+        #     # objects.append(new_record)
+        # query = db.select([heartrate])
+        # result_proxy = conn.execute(query)
+        # result_set = result_proxy.fetchall()
+        # print(result_set)
 
         # session.bulk_save_objects(objects)
         # session.commit()

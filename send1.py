@@ -3,7 +3,7 @@ from azure.eventhub.aio import EventHubProducerClient
 from azure.eventhub import EventData
 import json 
 import numpy as np
-from datetime import datetime
+import datetime
 
 async def run():
     # Create a producer client to send messages to the event hub.
@@ -22,7 +22,7 @@ async def run():
                 "source": "test_source", "unit": "bpm", "value":70, "confidence": 0.8, "dataPoints": []}
         for i in range(10):
             hr_data['dataPoints'].append({
-                "timestamp": str(datetime.utcnow()),
+                "timestamp": str(datetime.datetime.now()),
                 "value": np.random.normal(80, 10)
             })
 
