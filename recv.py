@@ -9,7 +9,7 @@ from avro_validator.schema import Schema
 import avro
 from fastavro.validation import validate
 from fastavro import parse_schema
-from postgresdb import *
+# from postgresdb import *
 from sqlitedb import conn,heartrate
 import sqlalchemy as db 
 
@@ -20,17 +20,17 @@ data_dict_path = os.path.join(script_dir,"data_dictionary/personicle_data_types.
 with open(data_dict_path, 'r') as fi:
             personcile_data_types_json = json.load(fi)
 
-session = loadSession()
+# session = loadSession()
 
-# map table name to correcspoding model class name 
-table_to_class = {'heartrate': Heartrate, 'heart_intensity_minutes': '', 'active_minutes': '', 'resting_calories': '','active_calories':'',
-'total_calories': '', 'distance': '', 'weight': '', 'body_fat': '', 'height':'', 'location': '', 'speed': '', 'blood_glucose': '',
-'body_temperature':''
-}
+# # map table name to correcspoding model class name 
+# table_to_class = {'heartrate': Heartrate, 'heart_intensity_minutes': '', 'active_minutes': '', 'resting_calories': '','active_calories':'',
+# 'total_calories': '', 'distance': '', 'weight': '', 'body_fat': '', 'height':'', 'location': '', 'speed': '', 'blood_glucose': '',
+# 'body_temperature':''
+# }
 
 #function to return model class name
-def getClass(table_name):
-    return table_to_class[table_name]
+# def getClass(table_name):
+#     return table_to_class[table_name]
 
 async def on_event(partition_context, event):
     # Print the event data.
@@ -65,7 +65,7 @@ async def on_event(partition_context, event):
         for datapoint in current_event['dataPoints']:
             timestamp = datapoint['timestamp']
             value = datapoint['value']
-            model_class = getClass(table_name)
+            # model_class = getClass(table_name)
             # new_record = model_class(individual_id=individual_id,timestamp=timestamp,source=source,value=value,unit=unit,confidence=confidence)
             query = heartrate.insert().values(individual_id=individual_id,timestamp=timestamp,source=source,value=value,unit=unit,confidence=confidence)
             # objects.append(new_record)
