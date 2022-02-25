@@ -8,7 +8,7 @@ Base = declarative_base(engine)
 Base.metadata.reflect(engine)
 
 class Heartrate(Base):
-    __table__ = Base.metadata.tables['heartrates']
+    __table__ = Base.metadata.tables['heartrate']
 
     def __repr__(self):
         return '''<Heartrate(individual_id='{0}', timestamp='{1}', source='{2}', value='{3}', unit='{4}', confidence='{5}')>'''.format(self.individual_id,

@@ -8,7 +8,7 @@
                 "heartrate": {
                     "ValueType": "Integer",
                     "Unit": "bpm",
-                    "TableName": "",
+                    "TableName": "heartrate",
                     "schema": ""
                 },
                 "heart_intensity_minutes": {

@@ -18,11 +18,11 @@ async def run():
         event_data_batch = await producer.create_batch()
 
         # Add events to the batch.
-        hr_data = {"streamName": "com.personicle.individual.datastreams.heart_rate", "individual_id": "test_user",
+        hr_data = {"streamName": "com.personicle.individual.datastreams.heartrate", "individual_id": "test_user",
                 "source": "test_source", "unit": "bpm", "value":70, "confidence": 0.8, "dataPoints": []}
-        for i in range(50):
+        for i in range(10):
             hr_data['dataPoints'].append({
-                "timestamp": str(datetime.now()),
+                "timestamp": str(datetime.utcnow()),
                 "value": np.random.normal(80, 10)
             })
 
