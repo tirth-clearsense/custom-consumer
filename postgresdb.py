@@ -2,8 +2,16 @@ from flask import session
 from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from configparser import ConfigParser
 
-engine = create_engine('postgresql://tirth:password@localhost/personicletest')
+config_object = ConfigParser()
+database = config_object["CREDENTIALS_DATABASE"]
+
+engine = create_engine("postgresql://{username}:{password}@{dbhost}/{dbname}".format(username=database['USERNAME'], password=database['PASSWORD'],
+                                                                                                        dbhost=database['HOST'], dbname=database['NAME']))
+
+engine.execute('''CREATE TABLE IF NOT EXISTS heartrate (individual_id TEXT, timestamp TIMESTAMP, source TEXT, value INT, unit TEXT, confidence REAL, PRIMARY KEY(individual_id, timestamp, source));''')
+
 Base = declarative_base(engine)
 Base.metadata.reflect(engine)
 

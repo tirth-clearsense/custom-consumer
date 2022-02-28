@@ -1,19 +1,19 @@
-from importlib.metadata import metadata
-import sqlalchemy as db 
-import sqlite3
+# from importlib.metadata import metadata
+# import sqlalchemy as db 
+# import sqlite3
 
-connection = sqlite3.connect('test.db')
+# connection = sqlite3.connect('test.db')
 
-cursor = connection.cursor()
-cursor.execute('''CREATE TABLE IF NOT EXISTS Heartrates (individual_id TEXT, timest timestamp, source TEXT, value INT, unit TEXT, confidence REAL, PRIMARY KEY(individual_id, timest, source))''')
+# cursor = connection.cursor()
+# cursor.execute('''CREATE TABLE IF NOT EXISTS Heartrates (individual_id TEXT, timest timestamp, source TEXT, value INT, unit TEXT, confidence REAL, PRIMARY KEY(individual_id, timest, source))''')
 
-connection.commit()
-connection.close()
+# connection.commit()
+# connection.close()
 
-engine = db.create_engine('sqlite:///test.db')
+# engine = db.create_engine('sqlite:///test.db')
 
-conn = engine.connect()
+# conn = engine.connect()
 
-metadata = db.MetaData()
+# metadata = db.MetaData()
 
-heartrate = db.Table('Heartrates', metadata, autoload=True, autoload_with=engine)
+# heartrate = db.Table('Heartrates', metadata, autoload=True, autoload_with=engine)
