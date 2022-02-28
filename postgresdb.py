@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from configparser import ConfigParser
 
 config_object = ConfigParser()
-database = config_object["CREDENTIALS_DATABASE"]
+database = config_object["CREDENTIALSDATABASE"]
 
 engine = create_engine("postgresql://{username}:{password}@{dbhost}/{dbname}".format(username=database['USERNAME'], password=database['PASSWORD'],
                                                                                                         dbhost=database['HOST'], dbname=database['NAME']))
