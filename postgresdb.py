@@ -23,6 +23,18 @@ class Heartrate(Base):
         return '''<Heartrate(individual_id='{0}', timestamp='{1}', source='{2}', value='{3}', unit='{4}', confidence='{5}')>'''.format(self.individual_id,
         self.timestamp, self.source, self.value, self.unit, self.confidence)
 
+class HeartIntensityMinutes(Base):
+    __table__ = Base.metadata.tables['heart_intensity_minutes']
+
+    # add string __repr__(self) here for this data type
+
+class ActiveMinutes(Base):
+    __table__ = Base.metadata.tables['active_minutes']
+
+    # add string __repr__(self) here for this data type
+
+    
+
 def loadSession():
     Session = sessionmaker(bind=engine)
     session = Session()
