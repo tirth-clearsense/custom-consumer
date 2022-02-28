@@ -25,7 +25,7 @@ async def run():
 
         # Add events to the batch.
         hr_data = {"streamName": "com.personicle.individual.datastreams.heartrate", "individual_id": "test_user",
-                "source": "test_source", "unit": "bpm", "value":70, "confidence": 0.8, "dataPoints": []}
+                "source": "test_source", "unit": "bpm", "confidence": 0.8, "dataPoints": []}
         for i in range(50):
             hr_data['dataPoints'].append({
                 "timestamp": str(datetime.utcnow()),
