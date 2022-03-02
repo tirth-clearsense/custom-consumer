@@ -7,6 +7,7 @@ import json
 import numpy as np
 from datetime import datetime
 from configparser import ConfigParser
+import time
 
 config_object = ConfigParser()
 config_object.read("config.ini")
@@ -29,11 +30,24 @@ async def run():
         for i in range(50):
             hr_data['dataPoints'].append({
                 "timestamp": str(datetime.utcnow()),
-                "value": np.random.normal(80, 10)
+                "value": int(np.random.normal(80, 10))
             })
+            time.sleep(0.01)
 
         print(hr_data)
         event_data_batch.add(EventData(json.dumps(hr_data)))
+
+        power_data = {"streamName": "com.personicle.individual.datastreams.cycling.power", "individual_id": "test_user",
+                "source": "test_source", "unit": "watts", "dataPoints": []}
+        for i in range(50):
+            power_data['dataPoints'].append({
+                "timestamp": str(datetime.utcnow()),
+                "value": np.random.normal(120, 10)
+            })
+            time.sleep(0.01)
+
+        print(power_data)
+        event_data_batch.add(EventData(json.dumps(power_data)))
         
         # Send the batch of events to the event hub.
         await producer.send_batch(event_data_batch)

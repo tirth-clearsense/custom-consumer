@@ -1,5 +1,6 @@
 import asyncio
 import json
+import traceback
 from urllib.request import CacheFTPHandler
 from azure.eventhub.aio import EventHubConsumerClient
 from azure.eventhub.extensions.checkpointstoreblobaio import BlobCheckpointStore
@@ -8,14 +9,16 @@ import os
 from fastavro.validation import validate
 from fastavro import parse_schema
 from postgresdb import *
+from base_schema import base_schema
 from configparser import ConfigParser
 
 Log_Format = "%(levelname)s %(asctime)s - %(message)s"
 logging.basicConfig(filename = "customconsumer.log",
                     filemode = "w",
-                    format = Log_Format, 
+                    format = Log_Format,
+                    level=logging.DEBUG
                     )
-logger = logging.getLogger() 
+logger = logging.getLogger(__name__) 
 
 config_object = ConfigParser()
 config_object.read("config.ini")
@@ -26,25 +29,20 @@ script_dir = os.path.dirname(__file__)
 data_dict_path = os.path.join(script_dir,"data_dictionary/personicle_data_types.json")
 
 with open(data_dict_path, 'r') as fi:
-            personcile_data_types_json = json.load(fi)
+    personcile_data_types_json = json.load(fi)
 
 session = loadSession()
 
-# map table name to correcspoding model class name 
-table_to_model = {'heartrate': Heartrate, 'heart_intensity_minutes': '', 'active_minutes': '', 'resting_calories': '','active_calories':'',
-'total_calories': '', 'distance': '', 'weight': '', 'body_fat': '', 'height':'', 'location': '', 'speed': '', 'blood_glucose': '',
-'body_temperature':''
-}
 
-# function to return model from class name
-def getClass(table_name):
-    return table_to_model[table_name]
 
-# function to get the table name from personicle data dictionary
-# input params: stream type 
-def getTableName(stream_type):
-    personicle_data_type = stream_type.split(".")
-    return personcile_data_types_json["com.personicle"]["individual"]["datastreams"][personicle_data_type[-1]]["TableName"]
+
+def match_data_dictionary(stream_name):
+    """
+    Match a data type to the personicle data dictionary
+    returns the data type information from the data dictionary
+    """
+    data_stream = personcile_data_types_json["com.personicle"]["individual"]["datastreams"][stream_name]
+    return data_stream
 
 # function to store the incoming events to postgres database
 async def on_event(partition_context, event):
@@ -56,7 +54,10 @@ async def on_event(partition_context, event):
         current_event = event.body_as_json(encoding='UTF-8')
         stream_type = current_event['streamName']
         
-        file_path = os.path.join(script_dir, f"avro/{stream_type}"+".avsc")
+        # match the stream name to the data dictionary
+        stream_information = match_data_dictionary(stream_type)
+        # get the corresponding schema and the table
+        file_path = os.path.join(script_dir, f"avro/{stream_information['base_schema']}")
         
         with open(file_path, 'r') as fi:
             schema = json.load(fi)
@@ -64,20 +65,23 @@ async def on_event(partition_context, event):
         # validate the event with avro schema
         parsed_schema = parse_schema(schema) 
         validate(current_event, parsed_schema)
-        print("Valid event")
+        logger.info("Valid event")
 
         # if valid, get the table name and store data
-        table_name = getTableName(stream_type)
+        table_name = stream_information['TableName']
 
         individual_id = current_event['individual_id']
         source=current_event['source']
         unit = current_event['unit']
+        model_class = generate_table_class(table_name, base_schema[stream_information['base_schema']])
 
-        confidence = current_event['confidence']
+        confidence = current_event.get('confidence', None)
         for datapoint in current_event['dataPoints']:
             timestamp = datapoint['timestamp']
             value = datapoint['value']
-            model_class = getClass(table_name)
+            # model_class = getClass(table_name)
+            logger.info(f"Adding data point: individual_id: {individual_id} \n \
+                timestamp= {timestamp}, source= {source}, value={value}, unit={unit}, confidence={confidence}")
             new_record = model_class(individual_id=individual_id,timestamp=timestamp,source=source,value=value,unit=unit,confidence=confidence)
             objects.append(new_record)
 
@@ -86,8 +90,9 @@ async def on_event(partition_context, event):
         
     except Exception as e:
         # print("Invalid event: \"{}\" from the partition with ID: \"{}\"".format(event.body_as_json(encoding='UTF-8'), partition_context.partition_id))
+        session.rollback()
         logger.error(e)
-        pass
+        logger.error(traceback.format_exc())
     
     # Update the checkpoint so that the program doesn't read the events
     # that it has already read when you run it next time.

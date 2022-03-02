@@ -9,11 +9,13 @@
         },
         {
             "name": "start_time",
-            "type": "long"
+            "type": "long",
+            "logicalType" : "timestamp-millis"
         },
         {
             "name": "end_time",
-            "type": "long"
+            "type": "long",
+            "logicalType" : "timestamp-millis"
         },
         {
             "name": "event_name",

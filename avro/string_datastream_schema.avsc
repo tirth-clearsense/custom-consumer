@@ -1,6 +1,6 @@
 {
-    "name": "heart_rate_record",
-    "namespace": "com.personicle.individual.datastreams.heart_rate",
+    "name": "string_valued_stream_message",
+    "namespace": "com.personicle.individual.datastreams.base.character_stream",
     "type": "record",
     "fields": [
         {
@@ -17,7 +17,7 @@
         },
         {
             "name": "confidence",
-            "type": "float"
+            "type": ["float", "null"]
         },
         {
             "name":"unit",
@@ -32,7 +32,7 @@
                         "type":"record",
                         "fields":[
                             {"name": "timestamp", "type":"string"},
-                            {"name": "value", "type":"double"}
+                            {"name": "value", "type":"string"}
                         ]
                     }
                 ]
