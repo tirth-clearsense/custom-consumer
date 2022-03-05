@@ -18,7 +18,7 @@ async def run():
     # Specify a connection string to your event hubs namespace and
     # the event hub name.
     producer = EventHubProducerClient.from_connection_string(conn_str="{connection_string}".format(connection_string=eventhub["CONNECTION_STRING"]), 
-                    eventhub_name="{name}".format(name=eventhub["EVENTHUB_NAME"]))
+                    eventhub_name="{name}".format(name=eventhub["DATASTREAM_EVENTHUB_NAME"]))
  
     async with producer:
         # Create a batch.

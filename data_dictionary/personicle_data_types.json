@@ -8,7 +8,7 @@
                 "com.personicle.individual.datastreams.heartrate": {
                     "ValueType": "Integer",
                     "Unit": "bpm",
-                    "TableName": "heartrate",
+                    "TableName": "heart_rate",
                     "base_schema": "integer_datastream_schema.avsc"
                 },
                 "com.personicle.individual.datastreams.heart_intensity_minutes": {
@@ -65,6 +65,12 @@
                     "TableName": "cycling_cadence",
                     "base_schema": "numeric_datastream_schema.avsc"
                 },
+                "com.personicle.individual.datastreams.cycling.cumulative_cadence": {
+                    "ValueType": "Numeric",
+                    "Unit": "rpm",
+                    "TableName": "cumulative_cycling_cadence",
+                    "base_schema": "numeric_datastream_schema.avsc"
+                },
                 "com.personicle.individual.datastreams.cycling.power": {
                     "ValueType": "Numeric",
                     "Unit": "watts",
@@ -76,6 +82,12 @@
                     "Unit": "stepsperminute",
                     "TableName": "step_cadence",
                     "base_schema": "numeric_datastream_schema.avsc"
+                },
+                "com.personicle.individual.datastreams.step.count": {
+                    "ValueType": "Integer",
+                    "Unit": "stepsperminute",
+                    "TableName": "step_count",
+                    "base_schema": "integer_datastream_schema.avsc"
                 },
                 "com.personicle.individual.datastreams.body_fat": {
                     "ValueType": "Numeric",

@@ -11,6 +11,7 @@ from fastavro import parse_schema
 from postgresdb import *
 from base_schema import base_schema
 from configparser import ConfigParser
+import copy
 
 Log_Format = "%(levelname)s %(asctime)s - %(message)s"
 logging.basicConfig(filename = "customconsumer.log",
@@ -73,7 +74,7 @@ async def on_event(partition_context, event):
         individual_id = current_event['individual_id']
         source=current_event['source']
         unit = current_event['unit']
-        model_class = generate_table_class(table_name, base_schema[stream_information['base_schema']])
+        model_class = generate_table_class(table_name, copy.deepcopy(base_schema[stream_information['base_schema']]))
 
         confidence = current_event.get('confidence', None)
         for datapoint in current_event['dataPoints']:
@@ -106,7 +107,7 @@ async def main():
  
     # # Create a consumer client for the event hub.
     client = EventHubConsumerClient.from_connection_string("{connection_string}".format(connection_string=eventhub["CONNECTION_STRING"]), 
-                consumer_group="{consumer_group}".format(consumer_group=eventhub['CONSUMER_GROUP']), eventhub_name="{name}".format(name=eventhub["EVENTHUB_NAME"]), checkpoint_store=checkpoint_store)
+                consumer_group="{consumer_group}".format(consumer_group=eventhub['DATASTREAM_CONSUMER_GROUP']), eventhub_name="{name}".format(name=eventhub["DATASTREAM_EVENTHUB_NAME"]), checkpoint_store=checkpoint_store)
     
     
     async with client:

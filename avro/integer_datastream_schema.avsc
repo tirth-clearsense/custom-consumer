@@ -21,7 +21,7 @@
         },
         {
             "name":"unit",
-            "type":"string"
+            "type":["string", "null"]
         },
         {
             "name": "dataPoints",
