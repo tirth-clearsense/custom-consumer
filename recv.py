@@ -1,7 +1,6 @@
 import asyncio
 import json
 import traceback
-from urllib.request import CacheFTPHandler
 from azure.eventhub.aio import EventHubConsumerClient
 from azure.eventhub.extensions.checkpointstoreblobaio import BlobCheckpointStore
 import logging
@@ -12,6 +11,8 @@ from postgresdb import *
 from base_schema import base_schema
 from configparser import ConfigParser
 import copy
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy import select
 
 Log_Format = "%(levelname)s %(asctime)s - %(message)s"
 logging.basicConfig(filename = "customconsumer.log",
@@ -77,17 +78,32 @@ async def on_event(partition_context, event):
         model_class = generate_table_class(table_name, copy.deepcopy(base_schema[stream_information['base_schema']]))
 
         confidence = current_event.get('confidence', None)
+        record_values = []
         for datapoint in current_event['dataPoints']:
             timestamp = datapoint['timestamp']
             value = datapoint['value']
             # model_class = getClass(table_name)
             logger.info(f"Adding data point: individual_id: {individual_id} \n \
                 timestamp= {timestamp}, source= {source}, value={value}, unit={unit}, confidence={confidence}")
-            new_record = model_class(individual_id=individual_id,timestamp=timestamp,source=source,value=value,unit=unit,confidence=confidence)
-            objects.append(new_record)
+            record_values.append({"individual_id": individual_id,"timestamp": timestamp,"source": source,"value": value,"unit": unit,"confidence": confidence})
+            # new_record = model_class(individual_id=individual_id,timestamp=timestamp,source=source,value=value,unit=unit,confidence=confidence)
+            # objects.append(new_record)
+        statement = insert(model_class).values(record_values)
+        statement = statement.on_conflict_do_nothing(index_elements=[model_class.individual_id, model_class.timestamp, model_class.source])\
+            .returning(model_class)
+        orm_stmt = (
+            select(model_class)
+            .from_statement(statement)
+            .execution_options(populate_existing=True)
+        )
 
-        session.bulk_save_objects(objects)
+        return_values = session.execute(orm_stmt,)
         session.commit()
+
+        logger.info("inserted {} rows".format(len(list(return_values))))
+
+        # session.bulk_save_objects(objects)
+        
         
     except Exception as e:
         # print("Invalid event: \"{}\" from the partition with ID: \"{}\"".format(event.body_as_json(encoding='UTF-8'), partition_context.partition_id))
