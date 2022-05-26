@@ -83,7 +83,8 @@ async def on_event(partition_context, event):
         model_class = generate_table_class(table_name, copy.deepcopy(base_schema[stream_information['base_schema']]))
         model_class_user_datastreams = generate_table_class("user_datastreams", copy.deepcopy(base_schema['user_datastreams_store.avsc']))
     
-        query =  model_class_user_datastreams.__table__.insert(individual_id=individual_id,datastream=stream_type,last_updated=datetime.datetime.now(),source=source)
+        # query =  model_class_user_datastreams.__table__.insert(individual_id=individual_id,datastream=stream_type,last_updated=datetime.datetime.now(),source=source)
+        query = insert(model_class_user_datastreams.__table__).values(individual_id=individual_id,datastream=stream_type,last_updated=datetime.datetime.now(),source=source)
         res= session.execute(query)
         session.commit()
         logger.info(f"Add datastream to user_datastreams: {res}")
