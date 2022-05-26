@@ -14,7 +14,7 @@ database = config_object["CREDENTIALS_DATABASE"]
 logger = logging.getLogger(__name__)
 
 engine = create_engine("postgresql://{username}:{password}@{dbhost}/{dbname}".format(username=database['USERNAME'], password=database['PASSWORD'],
-                                                                                                        dbhost=database['HOST'], dbname=database['NAME']))
+                                                                                                         dbhost=database['HOST'], dbname=database['NAME']))
 
 
 Base = declarative_base(engine)
@@ -34,6 +34,7 @@ def generate_table_class(table_name: str, base_schema: dict):
         logger.error(traceback.format_exc())
         generated_model = None
     return generated_model
+
 
 # class Heartrate(Base):
 #     __table__ = Base.metadata.tables['heartrate']

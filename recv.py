@@ -14,6 +14,7 @@ import copy
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy import select
 import requests
+import datetime
 
 Log_Format = "%(levelname)s %(asctime)s - %(message)s"
 logging.basicConfig(filename = "customconsumer.log",
@@ -48,7 +49,7 @@ def match_data_dictionary(stream_name):
     # return data_stream
     if not schema_response.status_code == 200:
         logger.warn(f"stream name {stream_name} not found")
-        
+
     return schema_response.json()
 # function to store the incoming events to postgres database
 async def on_event(partition_context, event):
@@ -80,7 +81,12 @@ async def on_event(partition_context, event):
         source=current_event['source']
         unit = current_event['unit']
         model_class = generate_table_class(table_name, copy.deepcopy(base_schema[stream_information['base_schema']]))
-
+        model_class_user_datastreams = generate_table_class("user_datastreams", copy.deepcopy(base_schema['user_datastreams_store.avsc']))
+    
+        query =  model_class_user_datastreams.__table__.insert(individual_id=individual_id,datastream=stream_type,last_updated=datetime.datetime.now(),source=source)
+        res= session.execute(query)
+        session.commit()
+        logger.info(f"Add datastream to user_datastreams: {res}")
         confidence = current_event.get('confidence', None)
         record_values = []
         for datapoint in current_event['dataPoints']:
@@ -100,7 +106,7 @@ async def on_event(partition_context, event):
             .from_statement(statement)
             .execution_options(populate_existing=True)
         )
-
+        
         return_values = session.execute(orm_stmt,)
         session.commit()
 
