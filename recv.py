@@ -13,6 +13,7 @@ from configparser import ConfigParser
 import copy
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy import select
+import requests
 
 Log_Format = "%(levelname)s %(asctime)s - %(message)s"
 logging.basicConfig(filename = "customconsumer.log",
@@ -26,7 +27,7 @@ config_object = ConfigParser()
 config_object.read("config.ini")
 eventhub = config_object["EVENTHUB"]
 azureblob = config_object["AZUREBLOB"]
-
+schema_api = config_object["PERSONICLE_SCHEMA_API"]
 script_dir = os.path.dirname(__file__)
 data_dict_path = os.path.join(script_dir,"data_dictionary/personicle_data_types.json")
 
@@ -36,16 +37,19 @@ with open(data_dict_path, 'r') as fi:
 session = loadSession()
 
 
-
-
 def match_data_dictionary(stream_name):
     """
     Match a data type to the personicle data dictionary
     returns the data type information from the data dictionary
     """
-    data_stream = personcile_data_types_json["com.personicle"]["individual"]["datastreams"][stream_name]
-    return data_stream
-
+    params = {'data_type': 'datastream','stream_name': stream_name}
+    schema_response = requests.get(schema_api['MATCH_DICTIONARY_ENDPOINT']+"/match-data-dictionary",params=params)
+    # data_stream = personcile_data_types_json["com.personicle"]["individual"]["datastreams"][stream_name]
+    # return data_stream
+    if not schema_response.status_code == 200:
+        logger.warn(f"stream name {stream_name} not found")
+        
+    return schema_response.json()
 # function to store the incoming events to postgres database
 async def on_event(partition_context, event):
     # Print the event data.
