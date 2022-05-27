@@ -12,9 +12,10 @@ from base_schema import base_schema
 from configparser import ConfigParser
 import copy
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy import select
+from sqlalchemy import select,update
 import requests
 import datetime
+from sqlalchemy.sql import exists 
 
 Log_Format = "%(levelname)s %(asctime)s - %(message)s"
 logging.basicConfig(filename = "customconsumer.log",
@@ -49,7 +50,7 @@ def match_data_dictionary(stream_name):
     # return data_stream
     if not schema_response.status_code == 200:
         logger.warn(f"stream name {stream_name} not found")
-
+    print(schema_response.json())
     return schema_response.json()
 # function to store the incoming events to postgres database
 async def on_event(partition_context, event):
@@ -84,16 +85,25 @@ async def on_event(partition_context, event):
         model_class_user_datastreams = generate_table_class("user_datastreams", copy.deepcopy(base_schema['user_datastreams_store.avsc']))
     
         # query =  model_class_user_datastreams.__table__.insert(individual_id=individual_id,datastream=stream_type,last_updated=datetime.datetime.now(),source=source)
-        query = insert(model_class_user_datastreams.__table__).values(individual_id=individual_id,datastream=stream_type,last_updated=datetime.datetime.now(),source=source)
-        res= session.execute(query)
+        data_stream_exists = session.query(exists().where( (model_class_user_datastreams.individual_id==individual_id) & 
+        (model_class_user_datastreams.datastream == stream_type) & (model_class_user_datastreams.source == source))).scalar()
+       
+        if data_stream_exists:
+            query = update(model_class_user_datastreams.__table__).where((model_class_user_datastreams.individual_id==individual_id) & 
+            (model_class_user_datastreams.datastream == stream_type) & (model_class_user_datastreams.source == source)).values(last_updated = datetime.datetime.now())
+        else: 
+            print("else")
+            query = insert(model_class_user_datastreams.__table__).values(individual_id=individual_id,datastream=stream_type,last_updated=datetime.datetime.now(),source=source)
+        
+        res = session.execute(query)
         session.commit()
-        print(f"Add datastream to user_datastreams: {res}")
+        # print(f"Add datastream to user_datastreams: { res.rowcount}")
         confidence = current_event.get('confidence', None)
         record_values = []
         for datapoint in current_event['dataPoints']:
             timestamp = datapoint['timestamp']
             value = datapoint['value']
-            # model_class = getClass(table_name)
+            # model_class = getClass(table_name) 
             logger.info(f"Adding data point: individual_id: {individual_id} \n \
                 timestamp= {timestamp}, source= {source}, value={value}, unit={unit}, confidence={confidence}")
             record_values.append({"individual_id": individual_id,"timestamp": timestamp,"source": source,"value": value,"unit": unit,"confidence": confidence})
