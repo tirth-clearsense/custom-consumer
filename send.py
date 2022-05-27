@@ -25,7 +25,7 @@ async def run():
         event_data_batch = await producer.create_batch()
 
         # Add events to the batch.
-        hr_data = {"streamName": "com.personicle.individual.datastreams.heartrate", "individual_id": "test_user",
+        hr_data = {"streamName": "com.personicle.individual.datastreams.test", "individual_id": "test_user",
                 "source": "test_source", "unit": "bpm", "confidence": 0.8, "dataPoints": []}
         for i in range(50):
             hr_data['dataPoints'].append({
@@ -37,7 +37,7 @@ async def run():
         print(hr_data)
         event_data_batch.add(EventData(json.dumps(hr_data)))
 
-        power_data = {"streamName": "com.personicle.individual.datastreams.cycling.power", "individual_id": "test_user",
+        power_data = {"streamName": "com.personicle.individual.datastreams.cadence", "individual_id": "test_user",
                 "source": "test_source", "unit": "watts", "dataPoints": []}
         for i in range(50):
             power_data['dataPoints'].append({

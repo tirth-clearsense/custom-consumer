@@ -87,7 +87,7 @@ async def on_event(partition_context, event):
         query = insert(model_class_user_datastreams.__table__).values(individual_id=individual_id,datastream=stream_type,last_updated=datetime.datetime.now(),source=source)
         res= session.execute(query)
         session.commit()
-        logger.info(f"Add datastream to user_datastreams: {res}")
+        print(f"Add datastream to user_datastreams: {res}")
         confidence = current_event.get('confidence', None)
         record_values = []
         for datapoint in current_event['dataPoints']:
@@ -112,6 +112,8 @@ async def on_event(partition_context, event):
         session.commit()
 
         logger.info("inserted {} rows".format(len(list(return_values))))
+        print("inserted {} rows".format(len(list(return_values))))
+
 
         # session.bulk_save_objects(objects)
         
