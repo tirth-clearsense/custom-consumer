@@ -50,7 +50,7 @@ def match_data_dictionary(stream_name):
     # return data_stream
     if not schema_response.status_code == 200:
         logger.warn(f"stream name {stream_name} not found")
-    print(schema_response.json())
+    # print(schema_response.json())
     return schema_response.json()
 # function to store the incoming events to postgres database
 async def on_event(partition_context, event):
@@ -88,15 +88,7 @@ async def on_event(partition_context, event):
         data_stream_exists = session.query(exists().where( (model_class_user_datastreams.individual_id==individual_id) & 
         (model_class_user_datastreams.datastream == stream_type) & (model_class_user_datastreams.source == source))).scalar()
        
-        if data_stream_exists:
-            query = update(model_class_user_datastreams.__table__).where((model_class_user_datastreams.individual_id==individual_id) & 
-            (model_class_user_datastreams.datastream == stream_type) & (model_class_user_datastreams.source == source)).values(last_updated = datetime.datetime.now())
-        else: 
-            print("else")
-            query = insert(model_class_user_datastreams.__table__).values(individual_id=individual_id,datastream=stream_type,last_updated=datetime.datetime.now(),source=source)
-        
-        res = session.execute(query)
-        session.commit()
+       
         # print(f"Add datastream to user_datastreams: { res.rowcount}")
         confidence = current_event.get('confidence', None)
         record_values = []
@@ -109,6 +101,17 @@ async def on_event(partition_context, event):
             record_values.append({"individual_id": individual_id,"timestamp": timestamp,"source": source,"value": value,"unit": unit,"confidence": confidence})
             # new_record = model_class(individual_id=individual_id,timestamp=timestamp,source=source,value=value,unit=unit,confidence=confidence)
             # objects.append(new_record)
+        max_timestamp = max(record_values, key=lambda dp: datetime.datetime.strptime(dp['timestamp'],'%Y-%m-%d %H:%M:%S.%f'))['timestamp']
+        logger.info(f"max timestamp is {max_timestamp}")
+        if data_stream_exists:
+            query = update(model_class_user_datastreams.__table__).where((model_class_user_datastreams.individual_id==individual_id) & 
+            (model_class_user_datastreams.datastream == stream_type) & (model_class_user_datastreams.source == source)).values(last_updated = max_timestamp)
+        else: 
+            query = insert(model_class_user_datastreams.__table__).values(individual_id=individual_id,datastream=stream_type,last_updated=max_timestamp,source=source)
+        
+        session.execute(query)
+        session.commit()
+        
         statement = insert(model_class).values(record_values)
         statement = statement.on_conflict_do_nothing(index_elements=[model_class.individual_id, model_class.timestamp, model_class.source])\
             .returning(model_class)
