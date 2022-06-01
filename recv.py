@@ -16,7 +16,7 @@ from sqlalchemy import select,update
 import requests
 import datetime
 from sqlalchemy.sql import exists 
-
+from dateutil.parser import parse
 Log_Format = "%(levelname)s %(asctime)s - %(message)s"
 logging.basicConfig(filename = "customconsumer.log",
                     filemode = "w",
@@ -30,6 +30,8 @@ config_object.read("config.ini")
 eventhub = config_object["EVENTHUB"]
 azureblob = config_object["AZUREBLOB"]
 schema_api = config_object["PERSONICLE_SCHEMA_API"]
+data_sync_api = config_object["PERSONICLE_DATA_SYNC_API"]
+
 script_dir = os.path.dirname(__file__)
 data_dict_path = os.path.join(script_dir,"data_dictionary/personicle_data_types.json")
 
@@ -37,7 +39,6 @@ with open(data_dict_path, 'r') as fi:
     personcile_data_types_json = json.load(fi)
 
 session = loadSession()
-
 
 def match_data_dictionary(stream_name):
     """
@@ -52,6 +53,7 @@ def match_data_dictionary(stream_name):
         logger.warn(f"stream name {stream_name} not found")
     # print(schema_response.json())
     return schema_response.json()
+    
 # function to store the incoming events to postgres database
 async def on_event(partition_context, event):
     # Print the event data.
@@ -80,6 +82,8 @@ async def on_event(partition_context, event):
 
         individual_id = current_event['individual_id']
         source=current_event['source']
+        if source == "Personicle":
+            logger.info("Personicle source")
         unit = current_event['unit']
         model_class = generate_table_class(table_name, copy.deepcopy(base_schema[stream_information['base_schema']]))
         model_class_user_datastreams = generate_table_class("user_datastreams", copy.deepcopy(base_schema['user_datastreams_store.avsc']))
@@ -87,10 +91,10 @@ async def on_event(partition_context, event):
         # query =  model_class_user_datastreams.__table__.insert(individual_id=individual_id,datastream=stream_type,last_updated=datetime.datetime.now(),source=source)
         data_stream_exists = session.query(exists().where( (model_class_user_datastreams.individual_id==individual_id) & 
         (model_class_user_datastreams.datastream == stream_type) & (model_class_user_datastreams.source == source))).scalar()
-       
-       
+        print(data_stream_exists)
         # print(f"Add datastream to user_datastreams: { res.rowcount}")
         confidence = current_event.get('confidence', None)
+        # if source != 'Personicle':
         record_values = []
         for datapoint in current_event['dataPoints']:
             timestamp = datapoint['timestamp']
@@ -99,9 +103,16 @@ async def on_event(partition_context, event):
             logger.info(f"Adding data point: individual_id: {individual_id} \n \
                 timestamp= {timestamp}, source= {source}, value={value}, unit={unit}, confidence={confidence}")
             record_values.append({"individual_id": individual_id,"timestamp": timestamp,"source": source,"value": value,"unit": unit,"confidence": confidence})
-            # new_record = model_class(individual_id=individual_id,timestamp=timestamp,source=source,value=value,unit=unit,confidence=confidence)
-            # objects.append(new_record)
-        max_timestamp = max(record_values, key=lambda dp: datetime.datetime.strptime(dp['timestamp'],'%Y-%m-%d %H:%M:%S.%f'))['timestamp']
+        # new_record = model_class(individual_id=individual_id,timestamp=timestamp,source=source,value=value,unit=unit,confidence=confidence)
+        # objects.append(new_record)
+
+        max_timestamp = max(record_values, key=lambda dp: parse(dp['timestamp']) )['timestamp'] 
+        min_timestamp = min(record_values, key=lambda dp: parse(dp['timestamp']) )['timestamp'] 
+
+    # max_timestamp = max(record_values, key=lambda dp: datetime.datetime.strptime(dp['timestamp'],'%Y-%m-%d %H:%M:%S.%f') if datetime.datetime.strptime(dp['timestamp'],'%Y-%m-%d %H:%M:%S.%f') else
+    # datetime.datetime.strptime(dp['timestamp'],'%Y-%m-%d %H:%M:%S') )['timestamp'] 
+    # min_timestamp = min(record_values, key=lambda dp: datetime.datetime.strptime(dp['timestamp'],'%Y-%m-%d %H:%M:%S.%f') if datetime.datetime.strptime(dp['timestamp'],'%Y-%m-%d %H:%M:%S.%f') else
+    # datetime.datetime.strptime(dp['timestamp'],'%Y-%m-%d %H:%M:%S') )['timestamp'] 
         logger.info(f"max timestamp is {max_timestamp}")
         if data_stream_exists:
             query = update(model_class_user_datastreams.__table__).where((model_class_user_datastreams.individual_id==individual_id) & 
@@ -123,14 +134,16 @@ async def on_event(partition_context, event):
         
         return_values = session.execute(orm_stmt,)
         session.commit()
-
         logger.info("inserted {} rows".format(len(list(return_values))))
         print("inserted {} rows".format(len(list(return_values))))
 
-
-        # session.bulk_save_objects(objects)
-        
-        
+        if source!="Personicle":
+            #call data cleaning api
+            logger.info("Calling data sync api")
+            params = {"user": individual_id, "freq": "1min", "data": stream_type,"source":source,"starttime": min_timestamp, "endtime": max_timestamp}
+            res = requests.get(data_sync_api["ENDPOINT"], params=params).json()
+            logger.info(f"Datastream cleaned response: {res}")
+         
     except Exception as e:
         # print("Invalid event: \"{}\" from the partition with ID: \"{}\"".format(event.body_as_json(encoding='UTF-8'), partition_context.partition_id))
         session.rollback()
