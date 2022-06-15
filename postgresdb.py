@@ -17,6 +17,7 @@ engine = create_engine("postgresql://{username}:{password}@{dbhost}/{dbname}".fo
                                                                                                          dbhost=database['HOST'], dbname=database['NAME']))
 
 
+
 Base = declarative_base(engine)
 
 TABLE_MODELS = {}

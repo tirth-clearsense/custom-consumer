@@ -17,6 +17,10 @@ import requests
 import datetime
 from sqlalchemy.sql import exists 
 from dateutil.parser import parse
+from flask import Flask
+
+app = Flask(__name__)
+
 Log_Format = "%(levelname)s %(asctime)s - %(message)s"
 logging.basicConfig(filename = "customconsumer.log",
                     filemode = "w",
@@ -53,7 +57,7 @@ def match_data_dictionary(stream_name):
         logger.warn(f"stream name {stream_name} not found")
     # print(schema_response.json())
     return schema_response.json()
-    
+
 # function to store the incoming events to postgres database
 async def on_event(partition_context, event):
     # Print the event data.
@@ -172,4 +176,5 @@ async def main():
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     # Run the main method.
-    loop.run_until_complete(main())
+    
+    app.run(loop.run_until_complete(main()))
