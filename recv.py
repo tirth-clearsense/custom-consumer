@@ -20,7 +20,6 @@ from dateutil.parser import parse
 from flask import Flask
 
 app = Flask(__name__)
-
 Log_Format = "%(levelname)s %(asctime)s - %(message)s"
 logging.basicConfig(filename = "customconsumer.log",
                     filemode = "w",
