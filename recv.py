@@ -140,12 +140,12 @@ async def on_event(partition_context, event):
         logger.info("inserted {} rows".format(len(list(return_values))))
         print("inserted {} rows".format(len(list(return_values))))
 
-        if source!="Personicle":
+        if not source.startswith("Personicle"):
             #call data cleaning api
             logger.info("Calling data sync api")
             params = {"user": individual_id, "freq": "1min", "data": stream_type,"source":source,"starttime": min_timestamp, "endtime": max_timestamp}
-            res = requests.get(data_sync_api["ENDPOINT"], params=params).json()
-            logger.info(f"Datastream cleaned response: {res}")
+            # res = requests.get(data_sync_api["ENDPOINT"], params=params).json()
+            # logger.info(f"Datastream cleaned response: {res}")
          
     except Exception as e:
         # print("Invalid event: \"{}\" from the partition with ID: \"{}\"".format(event.body_as_json(encoding='UTF-8'), partition_context.partition_id))
