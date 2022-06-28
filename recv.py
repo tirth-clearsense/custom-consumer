@@ -145,13 +145,23 @@ async def on_event(partition_context, event):
         session.commit()
         
         statement = insert(model_class).values(record_values)
-        statement = statement.on_conflict_do_nothing(index_elements=[model_class.individual_id, model_class.timestamp, model_class.source])\
+        
+        if is_interval:
+          statement = statement.on_conflict_do_nothing(index_elements=[model_class.individual_id, model_class.start_time, model_class.end_time, model_class.source])\
             .returning(model_class)
-        orm_stmt = (
-            select(model_class)
-            .from_statement(statement)
-            .execution_options(populate_existing=True)
-        )
+          orm_stmt = (
+              select(model_class)
+              .from_statement(statement)
+              .execution_options(populate_existing=True)
+          )
+        else:
+          statement = statement.on_conflict_do_nothing(index_elements=[model_class.individual_id, model_class.timestamp, model_class.source])\
+              .returning(model_class)
+          orm_stmt = (
+              select(model_class)
+              .from_statement(statement)
+              .execution_options(populate_existing=True)
+          )
         
         return_values = session.execute(orm_stmt,)
         session.commit()
