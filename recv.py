@@ -99,13 +99,24 @@ async def on_event(partition_context, event):
         confidence = current_event.get('confidence', None)
         # if source != 'Personicle':
         record_values = []
+        is_interval = "datastreams.interval" in stream_type
         for datapoint in current_event['dataPoints']:
-            timestamp = datapoint['timestamp']
-            value = datapoint['value']
-            # model_class = getClass(table_name) 
-            logger.info(f"Adding data point: individual_id: {individual_id} \n \
-                timestamp= {timestamp}, source= {source}, value={value}, unit={unit}, confidence={confidence}")
-            record_values.append({"individual_id": individual_id,"timestamp": timestamp,"source": source,"value": value,"unit": unit,"confidence": confidence})
+            try:
+              value = datapoint['value']
+              # model_class = getClass(table_name) 
+              if is_interval:
+                start_time = datapoint['start_time']
+                end_time = datapoint['end_time']
+                logger.info(f"Adding data point: individual_id: {individual_id} \n \
+                  start_time= {start_time}, end_time={end_time}, source= {source}, value={value}, unit={unit}, confidence={confidence}")
+                record_values.append({"individual_id": individual_id,"start_time": start_time, "end_time": end_time,"source": source,"value": value,"unit": unit,"confidence": confidence})
+              else:
+                timestamp = datapoint['timestamp']
+                logger.info(f"Adding data point: individual_id: {individual_id} \n \
+                  timestamp= {timestamp}, source= {source}, value={value}, unit={unit}, confidence={confidence}")
+                record_values.append({"individual_id": individual_id,"timestamp": timestamp,"source": source,"value": value,"unit": unit,"confidence": confidence})
+            except Exception as e:
+              continue
         # new_record = model_class(individual_id=individual_id,timestamp=timestamp,source=source,value=value,unit=unit,confidence=confidence)
         # objects.append(new_record)
 
