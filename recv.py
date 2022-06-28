@@ -123,9 +123,12 @@ async def on_event(partition_context, event):
               continue
         # new_record = model_class(individual_id=individual_id,timestamp=timestamp,source=source,value=value,unit=unit,confidence=confidence)
         # objects.append(new_record)
-
-        max_timestamp = max(record_values, key=lambda dp: parse(dp['timestamp']) )['timestamp'] 
-        min_timestamp = min(record_values, key=lambda dp: parse(dp['timestamp']) )['timestamp'] 
+        if is_interval:
+          max_timestamp = max(record_values, key=lambda dp: parse(dp['end_time']) )['end_time'] 
+          min_timestamp = min(record_values, key=lambda dp: parse(dp['start_time']) )['start_time'] 
+        else:
+          max_timestamp = max(record_values, key=lambda dp: parse(dp['timestamp']) )['timestamp'] 
+          min_timestamp = min(record_values, key=lambda dp: parse(dp['timestamp']) )['timestamp'] 
 
     # max_timestamp = max(record_values, key=lambda dp: datetime.datetime.strptime(dp['timestamp'],'%Y-%m-%d %H:%M:%S.%f') if datetime.datetime.strptime(dp['timestamp'],'%Y-%m-%d %H:%M:%S.%f') else
     # datetime.datetime.strptime(dp['timestamp'],'%Y-%m-%d %H:%M:%S') )['timestamp'] 
