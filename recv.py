@@ -105,17 +105,21 @@ async def on_event(partition_context, event):
               value = datapoint['value']
               # model_class = getClass(table_name) 
               if is_interval:
+                logger.info("Interval data stream {}".format(stream_type))
                 start_time = datapoint['start_time']
                 end_time = datapoint['end_time']
                 logger.info(f"Adding data point: individual_id: {individual_id} \n \
                   start_time= {start_time}, end_time={end_time}, source= {source}, value={value}, unit={unit}, confidence={confidence}")
                 record_values.append({"individual_id": individual_id,"start_time": start_time, "end_time": end_time,"source": source,"value": value,"unit": unit,"confidence": confidence})
               else:
+                logger.info("Instantaneous data stream {}".format(stream_type))
                 timestamp = datapoint['timestamp']
                 logger.info(f"Adding data point: individual_id: {individual_id} \n \
                   timestamp= {timestamp}, source= {source}, value={value}, unit={unit}, confidence={confidence}")
                 record_values.append({"individual_id": individual_id,"timestamp": timestamp,"source": source,"value": value,"unit": unit,"confidence": confidence})
             except Exception as e:
+              logger.error("Error while adding point for datastream {}".format(stream_type))
+              logger.error(e)
               continue
         # new_record = model_class(individual_id=individual_id,timestamp=timestamp,source=source,value=value,unit=unit,confidence=confidence)
         # objects.append(new_record)
