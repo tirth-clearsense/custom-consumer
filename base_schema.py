@@ -1,5 +1,5 @@
 from sqlalchemy import TIME, BigInteger, Boolean, Column, Float, TIMESTAMP
-from sqlalchemy.types import Integer, Numeric, String, ARRAY
+from sqlalchemy.types import Integer, Numeric, String, ARRAY, JSON
 base_schema = {
     "integer_datastream_schema.avsc": {
         "individual_id": Column(String, primary_key=True),
