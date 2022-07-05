@@ -54,7 +54,7 @@ def match_data_dictionary(stream_name):
     # return data_stream
     if not schema_response.status_code == 200:
         logger.warn(f"stream name {stream_name} not found")
-    # print(schema_response.json())
+    print(schema_response.json())
     return schema_response.json()
 
 # function to store the incoming events to postgres database
@@ -76,13 +76,21 @@ async def on_event(partition_context, event):
             schema = json.load(fi)
         
         # validate the event with avro schema
-        parsed_schema = parse_schema(schema) 
-        validate(current_event, parsed_schema)
-        logger.info("Valid event")
+        # parsed_schema = parse_schema(schema) 
+        # validate(current_event, parsed_schema) # call api
 
+        data_dict_params = {"data_type": "datastream"}
+        data_dict_response = requests.post(schema_api['VALIDATE_DATA_PACKET'], 
+        json=current_event, params=data_dict_params)
+        
+        if not json.loads(data_dict_response.text).get("schema_check", False):
+            logger.error(f"Invalid event: {current_event}")
+            return
+        logger.info("Valid event")
         # if valid, get the table name and store data
         table_name = stream_information['TableName']
-
+        print(table_name)
+        print(json.loads(data_dict_response.text))
         individual_id = current_event['individual_id']
         source=current_event['source']
         if source == "Personicle":
@@ -94,7 +102,7 @@ async def on_event(partition_context, event):
         # query =  model_class_user_datastreams.__table__.insert(individual_id=individual_id,datastream=stream_type,last_updated=datetime.datetime.now(),source=source)
         data_stream_exists = session.query(exists().where( (model_class_user_datastreams.individual_id==individual_id) & 
         (model_class_user_datastreams.datastream == stream_type) & (model_class_user_datastreams.source == source))).scalar()
-        print(data_stream_exists)
+        # print(data_stream_exists)
         # print(f"Add datastream to user_datastreams: { res.rowcount}")
         confidence = current_event.get('confidence', None)
         # if source != 'Personicle':
