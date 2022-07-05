@@ -70,10 +70,10 @@ async def on_event(partition_context, event):
         # match the stream name to the data dictionary
         stream_information = match_data_dictionary(stream_type)
         # get the corresponding schema and the table
-        file_path = os.path.join(script_dir, f"avro/{stream_information['base_schema']}")
+        # file_path = os.path.join(script_dir, f"avro/{stream_information['base_schema']}")
         
-        with open(file_path, 'r') as fi:
-            schema = json.load(fi)
+        # with open(file_path, 'r') as fi:
+        #     schema = json.load(fi)
         
         # validate the event with avro schema
         # parsed_schema = parse_schema(schema) 
