@@ -64,5 +64,13 @@ base_schema = {
         "provider": Column(String,default=None),
         "created_at": Column(TIMESTAMP),
         "updated_at": Column(TIMESTAMP)
+    },
+    "json_object_datastream_schema.avsc": {
+        "individual_id": Column(String, primary_key=True),
+        "timestamp": Column(TIMESTAMP, primary_key=True),
+        "source": Column(String, primary_key=True),
+        "value": Column(JSON),
+        "unit": Column(String),
+        "confidence": Column(String, default=None)
     }
 }
