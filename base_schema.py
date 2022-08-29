@@ -79,9 +79,7 @@ base_schema = {
         "timestamp": Column(TIMESTAMP, primary_key=True),
         "source": Column(String, primary_key=True),
         "value": Column(JSON),
-        "unit": Column(String),
-        "confidence": Column(String, default=None),
-        "sensor_location": Column(Geometry(geometry_type='POINT', srid=4326))
+#         "sensor_location": Column(Geometry(geometry_type='POINT', srid=4326))
 
     }
 }
