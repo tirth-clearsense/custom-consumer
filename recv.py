@@ -69,6 +69,7 @@ async def on_event(partition_context, event):
         
         # match the stream name to the data dictionary
         stream_information = match_data_dictionary(stream_type)
+        print(stream_information)
         # get the corresponding schema and the table
         # file_path = os.path.join(script_dir, f"avro/{stream_information['base_schema']}")
         
@@ -87,6 +88,7 @@ async def on_event(partition_context, event):
             logger.error(f"Invalid event: {current_event}")
             return
         logger.info("Valid event")
+        print("valid event")
         # if valid, get the table name and store data
         table_name = stream_information['TableName']
         print(table_name)
@@ -95,8 +97,9 @@ async def on_event(partition_context, event):
         source=current_event['source']
         if source == "Personicle":
             logger.info("Personicle source")
-        unit = current_event['unit']
+        unit = current_event.get('unit', None)
         model_class = generate_table_class(table_name, copy.deepcopy(base_schema[stream_information['base_schema']]))
+        print(model_class)
         model_class_user_datastreams = generate_table_class("user_datastreams", copy.deepcopy(base_schema['user_datastreams_store.avsc']))
     
         # query =  model_class_user_datastreams.__table__.insert(individual_id=individual_id,datastream=stream_type,last_updated=datetime.datetime.now(),source=source)

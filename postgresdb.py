@@ -32,6 +32,7 @@ def generate_table_class(table_name: str, base_schema: dict):
         generated_model.__table__.create(bind=engine, checkfirst=True)
         TABLE_MODELS[table_name] = generated_model
     except Exception as e:
+        print(e)
         logger.error(traceback.format_exc())
         generated_model = None
     return generated_model
