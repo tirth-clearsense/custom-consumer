@@ -78,7 +78,7 @@ base_schema = {
         "individual_id": Column(String, primary_key=True),
         "timestamp": Column(TIMESTAMP, primary_key=True),
         "source": Column(String, primary_key=True),
-        "value": Column(JSON),
+        "value": Column(JSON)
 #         "sensor_location": Column(Geometry(geometry_type='POINT', srid=4326))
 
     }
