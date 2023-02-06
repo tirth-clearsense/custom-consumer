@@ -87,7 +87,7 @@ async def on_event(partition_context, event):
         if not json.loads(data_dict_response.text).get("schema_check", False):
             logger.error(f"Invalid event: {current_event}")
             return
-        logger.info("Valid event")
+#         logger.info("Valid event")
         print("valid event")
         # if valid, get the table name and store data
         table_name = stream_information['TableName']
@@ -96,7 +96,7 @@ async def on_event(partition_context, event):
         individual_id = current_event['individual_id']
         source=current_event['source']
         if source == "Personicle":
-            logger.info("Personicle source")
+#             logger.info("Personicle source")
         unit = current_event.get('unit', None)
         model_class = generate_table_class(table_name, copy.deepcopy(base_schema[stream_information['base_schema']]))
         print(model_class)
@@ -116,17 +116,17 @@ async def on_event(partition_context, event):
               value = datapoint['value']
               # model_class = getClass(table_name) 
               if is_interval:
-                logger.info("Interval data stream {}".format(stream_type))
+#                 logger.info("Interval data stream {}".format(stream_type))
                 start_time = datapoint['start_time']
                 end_time = datapoint['end_time']
-                logger.info(f"Adding data point: individual_id: {individual_id} \n \
-                  start_time= {start_time}, end_time={end_time}, source= {source}, value={value}, unit={unit}, confidence={confidence}")
+#                 logger.info(f"Adding data point: individual_id: {individual_id} \n \
+#                   start_time= {start_time}, end_time={end_time}, source= {source}, value={value}, unit={unit}, confidence={confidence}")
                 record_values.append({"individual_id": individual_id,"start_time": start_time, "end_time": end_time,"source": source,"value": value,"unit": unit,"confidence": confidence})
               else:
-                logger.info("Instantaneous data stream {}".format(stream_type))
+#                 logger.info("Instantaneous data stream {}".format(stream_type))
                 timestamp = datapoint['timestamp']
-                logger.info(f"Adding data point: individual_id: {individual_id} \n \
-                  timestamp= {timestamp}, source= {source}, value={value}, unit={unit}, confidence={confidence}")
+#                 logger.info(f"Adding data point: individual_id: {individual_id} \n \
+#                   timestamp= {timestamp}, source= {source}, value={value}, unit={unit}, confidence={confidence}")
                 record_values.append({"individual_id": individual_id,"timestamp": timestamp,"source": source,"value": value,"unit": unit,"confidence": confidence})
             except Exception as e:
               logger.error("Error while adding point for datastream {}".format(stream_type))
@@ -145,7 +145,7 @@ async def on_event(partition_context, event):
     # datetime.datetime.strptime(dp['timestamp'],'%Y-%m-%d %H:%M:%S') )['timestamp'] 
     # min_timestamp = min(record_values, key=lambda dp: datetime.datetime.strptime(dp['timestamp'],'%Y-%m-%d %H:%M:%S.%f') if datetime.datetime.strptime(dp['timestamp'],'%Y-%m-%d %H:%M:%S.%f') else
     # datetime.datetime.strptime(dp['timestamp'],'%Y-%m-%d %H:%M:%S') )['timestamp'] 
-        logger.info(f"max timestamp is {max_timestamp}")
+#         logger.info(f"max timestamp is {max_timestamp}")
         if data_stream_exists:
             query = update(model_class_user_datastreams.__table__).where((model_class_user_datastreams.individual_id==individual_id) & 
             (model_class_user_datastreams.datastream == stream_type) & (model_class_user_datastreams.source == source)).values(last_updated = max_timestamp)
@@ -176,15 +176,15 @@ async def on_event(partition_context, event):
         
         return_values = session.execute(orm_stmt,)
         session.commit()
-        logger.info("inserted {} rows".format(len(list(return_values))))
+#         logger.info("inserted {} rows".format(len(list(return_values))))
         print("inserted {} rows".format(len(list(return_values))))
 
         if not source.startswith("Personicle"):
             #call data cleaning api
-            logger.info("Calling data sync api")
+#             logger.info("Calling data sync api")
             params = {"user": individual_id, "freq": "1min", "data": stream_type,"source":source,"starttime": min_timestamp, "endtime": max_timestamp}
             # res = requests.get(data_sync_api["ENDPOINT"], params=params).json()
-            # logger.info(f"Datastream cleaned response: {res}")
+#             logger.info(f"Datastream cleaned response: {res}")
          
     except Exception as e:
         # print("Invalid event: \"{}\" from the partition with ID: \"{}\"".format(event.body_as_json(encoding='UTF-8'), partition_context.partition_id))
