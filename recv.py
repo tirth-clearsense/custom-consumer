@@ -96,7 +96,7 @@ async def on_event(partition_context, event):
         individual_id = current_event['individual_id']
         source=current_event['source']
         if source == "Personicle":
-#             logger.info("Personicle source")
+            logger.info("Personicle source")
         unit = current_event.get('unit', None)
         model_class = generate_table_class(table_name, copy.deepcopy(base_schema[stream_information['base_schema']]))
         print(model_class)
